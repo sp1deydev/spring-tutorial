@@ -20,9 +20,8 @@ public class AirportController {
     private AirportService airportService;
 
     @GetMapping
-    public List<Airport> getAirports(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
-        Page<Airport> airportPage = airportService.getAirports(page, size);
-        return airportPage.getContent();
+    public List<AirportResponse> getAirports(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "5") int size) {
+        return airportService.getAirports(page, size);
     }
 
     @RequestMapping(method = RequestMethod.HEAD)
@@ -39,57 +38,24 @@ public class AirportController {
 
     @GetMapping("/{iata}")
     public AirportResponse getAirport(@PathVariable String iata) {
-        Airport airport = airportService.getAirport(iata);
+        return airportService.getAirport(iata);
 
-        return AirportResponse.builder()
-                .iata(airport.getIata())
-                .name(airport.getName())
-                .airportGroupCode(airport.getAirportGroupCode())
-                .language(airport.getLanguage())
-                .priority(airport.getPriority())
-                .build();
     }
 
     @PostMapping
     public AirportResponse createAirport(@RequestBody AirportRequest airportRequest) {
-        Airport createdAirport = airportService.createAirport(airportRequest);
-
-        return AirportResponse.builder()
-                .iata(createdAirport.getIata())
-                .name(createdAirport.getName())
-                .airportGroupCode(createdAirport.getAirportGroupCode())
-                .language(createdAirport.getLanguage())
-                .priority(createdAirport.getPriority())
-                .build();
-
+        return airportService.createAirport(airportRequest);
     }
 
     @PutMapping("/{iata}")
     public AirportResponse updateAirport(@PathVariable String iata, @RequestBody AirportRequest airportRequest) {
-        Airport updatedPathAirports = airportService.updateAirports(iata, airportRequest);;
-
-        return AirportResponse.builder()
-                .iata(updatedPathAirports.getIata())
-                .name(updatedPathAirports.getName())
-                .airportGroupCode(updatedPathAirports.getAirportGroupCode())
-                .language(updatedPathAirports.getLanguage())
-                .priority(updatedPathAirports.getPriority())
-                .build();
+        return airportService.updateAirports(iata, airportRequest);
     }
 
     @PatchMapping("/{iata}")
     public AirportResponse updatePatchAirport(@PathVariable String iata, @RequestBody AirportRequest airportRequest) {
-        Airport updatedPathAirports = airportService.updatePathAirports(iata, airportRequest);
-
-        return AirportResponse.builder()
-                .iata(updatedPathAirports.getIata())
-                .name(updatedPathAirports.getName())
-                .airportGroupCode(updatedPathAirports.getAirportGroupCode())
-                .language(updatedPathAirports.getLanguage())
-                .priority(updatedPathAirports.getPriority())
-                .build();
+        return airportService.updatePatchAirports(iata, airportRequest);
     }
-
 
     @DeleteMapping("/{iata}")
     public void deleteAirport(@PathVariable String iata) {
