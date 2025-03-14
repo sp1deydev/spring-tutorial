@@ -23,44 +23,49 @@ public class AirportService {
     AirportMapper airportMapper;
 
     public List<AirportResponse> getAirports(int page, int size) {
-        PageRequest pageable = PageRequest.of(page - 1, size);
-        return airportMapper.toListAirportResponse(airportRepository.findAll(pageable).getContent());
+        return airportMapper.toListAirportResponse(airportRepository.getAirports(page, size));
     }
 
     public int countAirports() {
-        return (int) airportRepository.count();
+        return airportRepository.countAirports();
     }
 
     public AirportResponse getAirport(String iata) {
-        Airport airport = airportRepository.findById(iata).orElseThrow(() -> new RuntimeException("User Not Found!"));
-        return airportMapper.toAirportResponse(airport);
+        return airportMapper.toAirportResponse(getAirportInfo(iata));
     }
 
     public AirportResponse createAirport(AirportRequest airportRequest) {
-        if(airportRepository.existsByIata(airportRequest.getIata())) {
+        if(airportRepository.isExisted(airportRequest.getIata())) {
             throw new RuntimeException("Airport is existed!");
         }
         Airport airport = airportMapper.toAirport(airportRequest);
-        return airportMapper.toAirportResponse(airportRepository.save(airport));
+        return airportMapper.toAirportResponse(airportRepository.createAirport(airport));
     }
 
     public void deleteAirport(String iata) {
-        airportRepository.deleteById(iata);
+        airportRepository.deleteAirport(iata);
     }
 
     public AirportResponse updateAirports(String iata, AirportRequest airportRequest) {
-        Airport airport = airportRepository.findById(iata).orElseThrow(() -> new RuntimeException("Airport not found!"));
+        Airport airport = getAirportInfo(iata);
         airportMapper.updateAirport(airport, airportRequest);
 
-        return airportMapper.toAirportResponse(airportRepository.save(airport));
+        return airportMapper.toAirportResponse(airportRepository.updateAirport(airport));
     }
 
     public AirportResponse updatePatchAirports(String iata, AirportRequest airportRequest) {
-        Airport airport = airportRepository.findById(iata)
-                .orElseThrow(() -> new RuntimeException("Airport not found with IATA: " + iata));
-
+        Airport airport = getAirportInfo(iata);
         airportMapper.updatePatchAirport(airport, airportRequest);
 
-        return airportMapper.toAirportResponse(airportRepository.save(airport));
+        return airportMapper.toAirportResponse(airportRepository.updatePatchAirport(airport));
     }
+
+    private Airport getAirportInfo(String iata) {
+        Airport airport = airportRepository.getAirport(iata);
+        if(airport == null) {
+            throw new RuntimeException("Airport not found!");
+        }
+        return airport;
+    }
+
 }
